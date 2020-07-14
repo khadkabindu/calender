@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:date_util/date_util.dart';
+import 'package:fluttercalender/custom_button.dart';
 import 'package:quiver/time.dart';
+import 'package:expandable/expandable.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,8 +24,6 @@ enum Months {
   December
 }
 
-var now = DateTime.now();
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+DateTime currentDate = DateTime.now();
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DateTime currentDate = DateTime.now();
+
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             CalenderView(UniqueKey(), currentDate),
+            ExpandableWrapper(currentDate),
           ],
         ),
       ),
@@ -144,6 +146,7 @@ class CalenderView extends StatefulWidget {
 class _CalenderViewState extends State<CalenderView> {
   var totalDaysOfMonths;
   var dateTime;
+  final bool isCurrentDay = false;
 
   List<String> days = List(40);
 
@@ -160,7 +163,9 @@ class _CalenderViewState extends State<CalenderView> {
   @override
   void initState() {
     dateTime = DateTime(widget.currentDate.year, widget.currentDate.month, 1);
-    totalDaysOfMonths = daysInMonth(widget.currentDate.year, widget.currentDate.month);
+    totalDaysOfMonths =
+        daysInMonth(widget.currentDate.year, widget.currentDate.month);
+
     numberOfDays();
     super.initState();
   }
@@ -177,6 +182,137 @@ class _CalenderViewState extends State<CalenderView> {
           itemBuilder: (BuildContext context, int index) {
             return Container(child: Center(child: Text(days[index])));
           }),
+    );
+  }
+}
+
+class ExpandableWrapper extends StatefulWidget {
+
+    final DateTime currentDate;
+   const ExpandableWrapper( this.currentDate);
+
+  @override
+  _ExpandableWrapperState createState() => _ExpandableWrapperState();
+}
+
+class _ExpandableWrapperState extends State<ExpandableWrapper> {
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpandableNotifier(
+      initialExpanded: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 8,
+              right: 0,
+              bottom: 8,
+              left: 16,
+            ),
+            child: Builder(
+              builder: (context) {
+                var controller = ExpandableController.of(context);
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          '${DateFormat('EEEE').format(DateTime(widget.currentDate.day-1)).substring(0,3).toUpperCase()}',
+                          style: TextStyle(
+                              color: Color(0xFF40A8F4),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300),
+                        ),
+                        Text(
+                          '${widget.currentDate.day}',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Color(0xFF40A8F4),
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          height: 28,
+                          child: CustomButton(
+                            color: Color(0xFF4FE2C0),
+                            label: 'Prev',
+                            onPressed: () {
+                              setState(() {
+                                currentDate = DateTime(currentDate.year,
+                                    currentDate.month - 1, currentDate.day);
+                              });
+                            },
+                            fontSize: 11,
+                            textColor: Color(0xff2D3B51),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 16),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        SizedBox(
+                          height: 28,
+                          child: CustomButton(
+                            color: Color(0xFF4FE2C0),
+                            label: 'Next',
+                            onPressed: () {
+                              setState(() {
+                                currentDate = DateTime(currentDate.year,
+                                    currentDate.month + 1, currentDate.day);
+                              });
+                            },
+                            fontSize: 11,
+                            textColor: Color(0xff2D3B51),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 16),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        SizedBox(
+                          height: 28,
+                          child: CustomButton(
+                            color: Color(0xFF4FE2C0),
+                            label: 'Today',
+                            onPressed: () {},
+                            fontSize: 11,
+                            textColor: Color(0xff2D3B51),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 16),
+                          ),
+                        ),
+                        IconButton(
+                          icon: controller.expanded
+                              ? Icon(Icons.keyboard_arrow_up)
+                              : Icon(Icons.keyboard_arrow_down),
+                          onPressed: () {
+                            controller.toggle();
+                          },
+                        )
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          Divider(
+            height: 1,
+          )
+        ],
+      ),
     );
   }
 }
