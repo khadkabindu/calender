@@ -1,5 +1,6 @@
-import 'package:date_util/date_util.dart';
 import 'package:flutter/material.dart';
+import 'package:date_util/date_util.dart';
+import 'package:quiver/time.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,7 +22,7 @@ enum Months {
   December
 }
 
-var now =  DateTime.now();
+var now = DateTime.now();
 
 class MyApp extends StatelessWidget {
   @override
@@ -54,10 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       child: IconButton(
                         onPressed: () {
-//                          setState(() {
-//                            currentDate = DateTime(currentDate.year,
-//                                currentDate.month - 1, currentDate.day);
-//                          });
+                          setState(() {
+                            currentDate = DateTime(currentDate.year,
+                                currentDate.month - 1, currentDate.day);
+                          });
                         },
                         icon: Icon(
                           Icons.arrow_back_ios,
@@ -90,9 +91,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       child: IconButton(
                         onPressed: () {
-//                          setState(() {
-//                            currentDate = DateTime(currentDate.year, currentDate.month+1, currentDate.day);
-//                          });
+                          setState(() {
+                            currentDate = DateTime(currentDate.year,
+                                currentDate.month + 1, currentDate.day);
+                          });
                         },
                         icon: Icon(
                           Icons.arrow_forward_ios,
@@ -122,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 }),
               ),
             ),
-            CalenderView(currentDate),
+            CalenderView(UniqueKey(), currentDate),
           ],
         ),
       ),
@@ -132,15 +134,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class CalenderView extends StatefulWidget {
   final DateTime currentDate;
-  CalenderView(this.currentDate);
+
+  const CalenderView(Key key, this.currentDate) : super(key: key);
 
   @override
   _CalenderViewState createState() => _CalenderViewState();
 }
 
 class _CalenderViewState extends State<CalenderView> {
-
-  var totalDaysOfMonths = DateUtil();
+  var totalDaysOfMonths;
   var dateTime;
 
   List<String> days = List(40);
@@ -150,15 +152,15 @@ class _CalenderViewState extends State<CalenderView> {
       days[i] = '';
     }
 
-    for (int i = 1; i < totalDaysOfMonths-1; i++) {
+    for (int i = 1; i < totalDaysOfMonths + 1; i++) {
       days[i + dateTime.weekday - 1] = i.toString();
     }
   }
 
   @override
   void initState() {
-    dateTime = DateTime(widget.currentDate.year, 2, 1);
-    totalDaysOfMonths = totalDaysOfMonths.daysInMonth(2,widget.currentDate.year);
+    dateTime = DateTime(widget.currentDate.year, widget.currentDate.month, 1);
+    totalDaysOfMonths = daysInMonth(widget.currentDate.year, widget.currentDate.month);
     numberOfDays();
     super.initState();
   }
