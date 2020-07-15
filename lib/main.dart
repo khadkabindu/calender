@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 void main() {
   runApp(MyApp());
 }
-
+DateTime currentDate = DateTime.now();
 enum WeekDays { Sun, Mon, Tue, Wed, Thu, Fri, Sat }
 enum Months {
   January,
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-DateTime currentDate = DateTime.now();
+
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -41,77 +41,79 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
+        child: ListView(
           children: <Widget>[
-            Container(
-                height: 60,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            currentDate = DateTime(currentDate.year,
-                                currentDate.month - 1, currentDate.day);
-                          });
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios,
-                          size: 16,
-                          color: Colors.white,
+            Column(
+              children: <Widget>[
+                Container(
+                    height: 60,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                currentDate = DateTime(currentDate.year,
+                                    currentDate.month - 1, currentDate.day);
+                              });
+                            },
+                            icon: Icon(
+                              Icons.arrow_back_ios,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          text:
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              text:
                               '${Months.values[(currentDate.month - 1)].toString().split('.').last}' +
                                   '',
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '${currentDate.year}',
-                              style:
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '${currentDate.year}',
+                                  style:
                                   TextStyle(fontSize: 14, color: Colors.white),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            currentDate = DateTime(currentDate.year,
-                                currentDate.month + 1, currentDate.day);
-                          });
-                        },
-                        icon: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: Colors.white,
+                        Expanded(
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                currentDate = DateTime(currentDate.year,
+                                    currentDate.month + 1, currentDate.day);
+                              });
+                            },
+                            icon: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Color(0xFF4FE2C0),
-                )),
-            ExpandableWrapper(currentDate),
-            Divider(
-              height: 1,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF4FE2C0),
+                    )),
+                ExpandableWrapper(currentDate),
+              ],
             ),
           ],
         ),
@@ -133,8 +135,6 @@ class _CalenderViewState extends State<CalenderView> {
   var totalDaysOfMonths;
   var dateTime;
   String currentDayDate;
-//  String currentMonth;
-
 
   List<String> days = List(40);
 
@@ -151,9 +151,10 @@ class _CalenderViewState extends State<CalenderView> {
   @override
   void initState() {
     dateTime = DateTime(widget.currentDate.year, widget.currentDate.month, 1);
-    totalDaysOfMonths = daysInMonth(widget.currentDate.year, widget.currentDate.month);
-//    currentMonth = widget.currentDate.month.toString();
+    totalDaysOfMonths =
+        daysInMonth(widget.currentDate.year, widget.currentDate.month);
     currentDayDate = widget.currentDate.day.toString();
+
     numberOfDays();
 
     super.initState();
@@ -172,15 +173,16 @@ class _CalenderViewState extends State<CalenderView> {
                 color: Colors.white,
                 child: Center(
                   child: Text(
-                    '${WeekDays.values[index].toString().split('.').last}' +
-                        '',style: TextStyle(fontWeight: FontWeight.bold),),
+                    '${WeekDays.values[index].toString().split('.').last}' + '',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               );
             }),
           ),
         ),
         Container(
-          height: 260,
+          height: 300,
           child: GridView.builder(
               itemCount: days.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -188,19 +190,22 @@ class _CalenderViewState extends State<CalenderView> {
               ),
               itemBuilder: (BuildContext context, int index) {
                 return GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     setState(() {
 
                     });
                   },
                   child: Container(
                       decoration: BoxDecoration(
-                        color: days[index] == currentDayDate ? Color(0xfff8f8f9) : Colors.white,
+                        color: days[index] == currentDayDate
+                            ? Color(0xfff8f8f9)
+                            : Colors.white,
                         border: Border(
-                          bottom:  BorderSide(
+                          bottom: BorderSide(
                               width: 2.0,
-                              color:
-                              days[index] == currentDayDate? Color(0xFF4FE2C0) : Colors.transparent),
+                              color: days[index] == currentDayDate
+                                  ? Color(0xFF4FE2C0)
+                                  : Colors.transparent),
                         ),
                       ),
                       child: Center(child: Text(days[index]))),
@@ -214,6 +219,7 @@ class _CalenderViewState extends State<CalenderView> {
 
 class ExpandableWrapper extends StatefulWidget {
   final DateTime currentDate;
+
   const ExpandableWrapper(this.currentDate);
 
   @override
@@ -222,7 +228,8 @@ class ExpandableWrapper extends StatefulWidget {
 
 class _ExpandableWrapperState extends State<ExpandableWrapper> {
 
-  Iterable<TimeOfDay> getTimes(TimeOfDay startTime, TimeOfDay endTime, Duration step) sync* {
+  Iterable<TimeOfDay> getTimes(
+      TimeOfDay startTime, TimeOfDay endTime, Duration step) sync* {
     var hour = startTime.hour;
     var minute = startTime.minute;
 
@@ -237,9 +244,17 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
         (hour == endTime.hour && minute <= endTime.minute));
   }
 
+  final startTime = TimeOfDay(hour: 1, minute: 0);
+  final endTime = TimeOfDay(hour: 23, minute: 0);
+  final step = Duration(minutes: 60);
+  List<String> times = [];
+
 
   @override
   Widget build(BuildContext context) {
+    times = getTimes(startTime, endTime, step)
+        .map((tod) => tod.format(context))
+        .toList();
     return ExpandableNotifier(
       initialExpanded: true,
       child: Column(
@@ -338,8 +353,34 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
               },
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 8,
+              right: 0,
+              bottom: 8,
+              left: 16,
+            ),
+            child: ListView.builder(
 
-
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+              itemCount: times.length,
+                itemBuilder: (BuildContext context, int index){
+              return Container(
+                height: 80,
+                child: Row(
+                  children: <Widget>[
+                    Text('${times[index]}'),
+                    SizedBox(width: 5,),
+                    Container(
+                      color: Colors.black26,
+                      height: 0.5,
+                      width: 290,),
+                  ],
+                ),
+              );
+            }),
+          ),
         ],
       ),
     );
