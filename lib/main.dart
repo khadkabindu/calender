@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 DateTime currentDate = DateTime.now();
 
 class MyHomePage extends StatefulWidget {
@@ -40,11 +41,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -109,24 +109,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 decoration: BoxDecoration(
                   color: Color(0xFF4FE2C0),
                 )),
-            Container(
-              height: 50,
-              child: GridView.count(
-                crossAxisCount: 7,
-                children: List.generate(7, (index) {
-                  return Container(
-                    color: Colors.white,
-                    child: Center(
-                      child: Text(
-                          '${WeekDays.values[index].toString().split('.').last}' +
-                              ''),
-                    ),
-                  );
-                }),
-              ),
-            ),
-            CalenderView(UniqueKey(), currentDate),
             ExpandableWrapper(currentDate),
+            Divider(
+              height: 1,
+            ),
           ],
         ),
       ),
@@ -146,7 +132,9 @@ class CalenderView extends StatefulWidget {
 class _CalenderViewState extends State<CalenderView> {
   var totalDaysOfMonths;
   var dateTime;
-  final bool isCurrentDay = false;
+  String currentDayDate;
+//  String currentMonth;
+
 
   List<String> days = List(40);
 
@@ -163,33 +151,70 @@ class _CalenderViewState extends State<CalenderView> {
   @override
   void initState() {
     dateTime = DateTime(widget.currentDate.year, widget.currentDate.month, 1);
-    totalDaysOfMonths =
-        daysInMonth(widget.currentDate.year, widget.currentDate.month);
-
+    totalDaysOfMonths = daysInMonth(widget.currentDate.year, widget.currentDate.month);
+//    currentMonth = widget.currentDate.month.toString();
+    currentDayDate = widget.currentDate.day.toString();
     numberOfDays();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      child: GridView.builder(
-          itemCount: days.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 50,
+          child: GridView.count(
             crossAxisCount: 7,
+            children: List.generate(7, (index) {
+              return Container(
+                color: Colors.white,
+                child: Center(
+                  child: Text(
+                    '${WeekDays.values[index].toString().split('.').last}' +
+                        '',style: TextStyle(fontWeight: FontWeight.bold),),
+                ),
+              );
+            }),
           ),
-          itemBuilder: (BuildContext context, int index) {
-            return Container(child: Center(child: Text(days[index])));
-          }),
+        ),
+        Container(
+          height: 260,
+          child: GridView.builder(
+              itemCount: days.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return GestureDetector(
+                  onTap: (){
+                    setState(() {
+
+                    });
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: days[index] == currentDayDate ? Color(0xfff8f8f9) : Colors.white,
+                        border: Border(
+                          bottom:  BorderSide(
+                              width: 2.0,
+                              color:
+                              days[index] == currentDayDate? Color(0xFF4FE2C0) : Colors.transparent),
+                        ),
+                      ),
+                      child: Center(child: Text(days[index]))),
+                );
+              }),
+        ),
+      ],
     );
   }
 }
 
 class ExpandableWrapper extends StatefulWidget {
-
-    final DateTime currentDate;
-   const ExpandableWrapper( this.currentDate);
+  final DateTime currentDate;
+  const ExpandableWrapper(this.currentDate);
 
   @override
   _ExpandableWrapperState createState() => _ExpandableWrapperState();
@@ -197,6 +222,20 @@ class ExpandableWrapper extends StatefulWidget {
 
 class _ExpandableWrapperState extends State<ExpandableWrapper> {
 
+  Iterable<TimeOfDay> getTimes(TimeOfDay startTime, TimeOfDay endTime, Duration step) sync* {
+    var hour = startTime.hour;
+    var minute = startTime.minute;
+
+    do {
+      yield TimeOfDay(hour: hour, minute: minute);
+      minute += step.inMinutes;
+      while (minute >= 60) {
+        minute -= 60;
+        hour++;
+      }
+    } while (hour < endTime.hour ||
+        (hour == endTime.hour && minute <= endTime.minute));
+  }
 
 
   @override
@@ -206,7 +245,9 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-
+          Expandable(
+            expanded: CalenderView(UniqueKey(), currentDate),
+          ),
           Padding(
             padding: const EdgeInsets.only(
               top: 8,
@@ -223,7 +264,7 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
                     Column(
                       children: [
                         Text(
-                          '${DateFormat('EEEE').format(DateTime(widget.currentDate.day-1)).substring(0,3).toUpperCase()}',
+                          '${DateFormat('EEEE').format(DateTime(widget.currentDate.day - 1)).substring(0, 3).toUpperCase()}',
                           style: TextStyle(
                               color: Color(0xFF40A8F4),
                               fontSize: 13,
@@ -245,17 +286,11 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
                           child: CustomButton(
                             color: Color(0xFF4FE2C0),
                             label: 'Prev',
-                            onPressed: () {
-                              setState(() {
-                                currentDate = DateTime(currentDate.year,
-                                    currentDate.month - 1, currentDate.day);
-                              });
-                            },
+                            onPressed: () {},
                             fontSize: 11,
                             textColor: Color(0xff2D3B51),
                             padding: const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 16),
+                                vertical: 4, horizontal: 16),
                           ),
                         ),
                         SizedBox(
@@ -266,12 +301,7 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
                           child: CustomButton(
                             color: Color(0xFF4FE2C0),
                             label: 'Next',
-                            onPressed: () {
-                              setState(() {
-                                currentDate = DateTime(currentDate.year,
-                                    currentDate.month + 1, currentDate.day);
-                              });
-                            },
+                            onPressed: () {},
                             fontSize: 11,
                             textColor: Color(0xff2D3B51),
                             padding: const EdgeInsets.symmetric(
@@ -308,9 +338,8 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
               },
             ),
           ),
-          Divider(
-            height: 1,
-          )
+
+
         ],
       ),
     );
