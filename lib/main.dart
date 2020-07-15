@@ -136,6 +136,7 @@ class _CalenderViewState extends State<CalenderView> {
   var dateTime;
   String currentDayDate;
 
+
   List<String> days = List(40);
 
   void numberOfDays() {
@@ -208,7 +209,7 @@ class _CalenderViewState extends State<CalenderView> {
                                   : Colors.transparent),
                         ),
                       ),
-                      child: Center(child: Text(days[index]))),
+                      child: Center(child: Text(days[index],style: TextStyle(color: days[index] == currentDayDate ? Color(0xFF4FE2C0): Colors.black),))),
                 );
               }),
         ),
@@ -248,13 +249,17 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
   final endTime = TimeOfDay(hour: 23, minute: 0);
   final step = Duration(minutes: 60);
   List<String> times = [];
+  final controller = ScrollController();
 
 
   @override
   Widget build(BuildContext context) {
+
     times = getTimes(startTime, endTime, step)
         .map((tod) => tod.format(context))
         .toList();
+    var time = DateFormat.jm().format(DateTime.now());
+    print(time);
     return ExpandableNotifier(
       initialExpanded: true,
       child: Column(
@@ -353,6 +358,10 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
               },
             ),
           ),
+          Divider(
+            height: 1,
+            color: Colors.black26,
+          ),
           Padding(
             padding: const EdgeInsets.only(
               top: 8,
@@ -360,26 +369,36 @@ class _ExpandableWrapperState extends State<ExpandableWrapper> {
               bottom: 8,
               left: 16,
             ),
-            child: ListView.builder(
+            child: SingleChildScrollView(
+              physics: ScrollPhysics(),
+              child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                itemCount: times.length,
+                  itemBuilder: (BuildContext context, int index){
+                return Container(
+                  height: 80,
+                  child: Row(
+                    children: <Widget>[
+                      Text('${times[index].substring(0,times[index].indexOf(':')) + times[index].substring(4,7)}'),
+                      Container(
 
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-              itemCount: times.length,
-                itemBuilder: (BuildContext context, int index){
-              return Container(
-                height: 80,
-                child: Row(
-                  children: <Widget>[
-                    Text('${times[index]}'),
-                    SizedBox(width: 5,),
-                    Container(
-                      color: Colors.black26,
-                      height: 0.5,
-                      width: 290,),
-                  ],
-                ),
-              );
-            }),
+                        child: VerticalDivider(
+
+                        ),
+                       height: 100,
+
+                      ),
+                      Container(
+                        color: Colors.black26,
+
+                        height: 0.5,
+                        width: 300,),
+                    ],
+                  ),
+                );
+              }),
+            ),
           ),
         ],
       ),
